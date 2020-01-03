@@ -69,6 +69,9 @@ class Graphs extends React.Component{
                     <a href="https://github.com/a7000q/react-graph">Frontend source</a>
                     <br/>
                     <a href="https://github.com/a7000q/graph">Backend source</a>
+                    <br/>
+                    <a href="https://github.com/a7000q/socket-io">Socket.IO source</a>
+
                 </div>
             </div>
         );
