@@ -2,6 +2,8 @@ import React from "react";
 import { getGraph, addPoint, updateEdgeValue, updateEdge, addEdge, deleteEdge, deletePoint, buildRoute } from "../axios/Requests";
 
 import TGraph from "react-graph-vis";
+import openSocket from 'socket.io-client';
+import {URL} from '../components/Socket'
 
 class Graph extends React.Component{
 
@@ -19,6 +21,13 @@ class Graph extends React.Component{
 
     componentDidMount(){
         this.getAndSetGraph();
+        //console.log('editGraph' + this.state.graph.id);
+        const  socket = openSocket(URL);
+        socket.on('editGraph' + this.props.match.params.id, () => {
+            this.getAndSetGraph();
+        });
+
+        this.setState({socket: socket});
     }
 
     clickAddPoint = () => {
@@ -26,6 +35,7 @@ class Graph extends React.Component{
         addPoint(this.state.graph.id, name).then((response) => {
             this.refs.newPointInput.value = "";
             this.getAndSetGraph();
+            this.state.socket.emit('event', {name: "editGraph" + this.state.graph.id});
         });
     }
 
@@ -151,6 +161,7 @@ class Graph extends React.Component{
         updateEdgeValue(edge_id, value).then(() => {
             this.getAndSetGraph();
             this.setEditMode([]);
+            this.state.socket.emit('event', {name: "editGraph" + this.state.graph.id});
         });
     }
 
@@ -170,6 +181,7 @@ class Graph extends React.Component{
                 addEdge: (data, callback) => {
                     addEdge(this.state.graph.id, data.from, data.to).then(() => {
                         this.getAndSetGraph();
+                        this.state.socket.emit('event', {name: "editGraph" + this.state.graph.id});
                     });
                 },
                 editEdge:  (data, callback) => {
@@ -178,17 +190,20 @@ class Graph extends React.Component{
                         to_point_id: data.to
                     }).then(() => {
                         this.getAndSetGraph();
+                        this.state.socket.emit('event', {name: "editGraph" + this.state.graph.id});
                     });
                 },
                 deleteEdge: (data, callback) => {
                     deleteEdge(data.edges[0]).then(() => {
                         this.getAndSetGraph();
                         this.setEditMode([]);
+                        this.state.socket.emit('event', {name: "editGraph" + this.state.graph.id});
                     });
                 },
                 deleteNode: (data, callback) => {
                     deletePoint(data.nodes[0]).then(() => {
                         this.getAndSetGraph();
+                        this.state.socket.emit('event', {name: "editGraph" + this.state.graph.id});
                     });
                 },
                 initiallyActive: true,

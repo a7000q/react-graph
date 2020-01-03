@@ -1,6 +1,8 @@
 import React from "react";
 import { IoIosCloseCircle } from "react-icons/io";
 import { getAllGraphs, deleteGraph, addGraph } from "../axios/Requests";
+import openSocket from 'socket.io-client';
+import {URL} from '../components/Socket'
 
 class Graphs extends React.Component{
     state = {
@@ -18,11 +20,19 @@ class Graphs extends React.Component{
 
     componentDidMount() {
         this.getAndSetData();
+        const  socket = openSocket(URL);
+        socket.on('editGraphs', () => {
+            this.getAndSetData();
+        });
+
+        this.setState({socket: socket});
+
     }
 
     clickDeleteGraph = (e, graph) => {
         deleteGraph(graph.id).then(() => {
             this.getAndSetData();
+            this.state.socket.emit('event', {name: 'editGraphs'});
         })
     }
 
@@ -31,6 +41,7 @@ class Graphs extends React.Component{
         addGraph(name).then(() => {
             this.refs.newGraphInput.value = "";
             this.getAndSetData();
+            this.state.socket.emit('event', {name: 'editGraphs'});
         });
     }
 
