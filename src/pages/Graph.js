@@ -161,6 +161,7 @@ class Graph extends React.Component{
             layout: {
                 hierarchical: true
             },
+            locale: "ru",
             clickToUse: true,
             interaction: { hover: true , navigationButtons: true},
             manipulation: {
